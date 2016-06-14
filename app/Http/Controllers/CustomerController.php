@@ -54,36 +54,35 @@ class CustomerController extends Controller
      */
     public function store(){
 
+        $validator = Validator::make($this->form_data, [
+            'email' => 'required|email|max:50',
+            'first_name' => 'required|max:50',
+            'last_name' => 'required|max:50',
+            'company' => 'required|max:100',
+            'phone' => 'required|max:50',
+            'address_1' => 'required|max:250',
+            'address_2' => 'max:100',
+            'city' => 'required|max:50',
+            'state' => 'required|max:50',
+            'zip' => 'required|max:50'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('/dashboard/customers/create')
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $this->setGeocode($this->form_data['zip']);
+
         $us_address_validation = $this->validateUSAddress();
 
-        if($us_address_validation){
-            $validator = Validator::make($this->form_data, [
-                'email' => 'required|email|max:50',
-                'first_name' => 'required|max:50',
-                'last_name' => 'required|max:50',
-                'company' => 'required|max:100',
-                'phone' => 'required|max:50',
-                'address_1' => 'required|max:250',
-                'address_2' => 'max:100',
-                'city' => 'required|max:50',
-                'state' => 'required|max:50',
-                'zip' => 'required|max:50'
-            ]);
-
-            if ($validator->fails()) {
-                return redirect('/dashboard/customers/create')
-                    ->withErrors($validator)
-                    ->withInput();
-            }
-
-            $this->setGeocode($this->form_data['zip']);
+        if($us_address_validation) {
             Customer::create($this->form_data);
-
-            return redirect('/dashboard/customers');
+            return redirect('/dashboard/customers')->withSuccess('Customer Successfully Added');
         }else{
             return redirect()->back()->withErrors('Please enter a valid US Address')->withInput();
         }
-
     }
 
     /**
@@ -105,36 +104,38 @@ class CustomerController extends Controller
      * @return mixed
      */
     public function update($customer_id){
+        $validator = Validator::make($this->form_data, [
+            'first_name' => 'required|max:50',
+            'last_name' => 'required|max:50',
+            'company' => 'required|max:100',
+            'phone' => 'required|max:50',
+            'email' => 'required|email|max:50',
+            'address_1' => 'required|max:250',
+            'address_2' => 'max:100',
+            'city' => 'required|max:50',
+            'state' => 'required|max:50',
+            'zip' => 'required|max:50',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('/dashboard/customers/edit/'.$customer_id)
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $this->setGeocode($this->form_data['zip']);
+
         $us_address_validation = $this->validateUSAddress();
 
-        if($us_address_validation){
-            $validator = Validator::make($this->form_data, [
-                'first_name' => 'required|max:50',
-                'last_name' => 'required|max:50',
-                'company' => 'required|max:100',
-                'phone' => 'required|max:50',
-                'email' => 'required|email|max:50',
-                'address_1' => 'required|max:250',
-                'address_2' => 'max:100',
-                'city' => 'required|max:50',
-                'state' => 'required|max:50',
-                'zip' => 'required|max:50',
-            ]);
+        if($us_address_validation) {
 
-            if ($validator->fails()) {
-                return redirect('/dashboard/customers/edit/'.$customer_id)
-                    ->withErrors($validator)
-                    ->withInput();
-            }
-
-            $this->setGeocode($this->form_data['zip']);
-
-            if(Customer::where('id', $customer_id)->update($this->form_data))
+            if (Customer::where('id', $customer_id)->update($this->form_data))
                 return redirect()->back()->withSuccess('Customer Successfully Updated');
 
             return redirect()->back()->withErrors('Failed Update Customer!');
         }else{
             return redirect()->back()->withErrors('Please enter a valid US Address')->withInput();
+
         }
 
     }
