@@ -1,0 +1,24 @@
+{
+  "name": "sb",
+  "version": "0.0.0",
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.6",
+    "Chart.js": "chartjs#~2.0.2",
+    "jquery": "~2.2.3",
+    "metisMenu": "~2.5.0",
+    "font-awesome": "fontawesome#~4.6.1"
+  }
+}
